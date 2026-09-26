@@ -2,16 +2,16 @@ package proyecto;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public abstract class Usuario {
 	private String nombre;
 	private String documento;
 	private String telefono;
 	private String email;
-	private int totalCalificaciones ; //readOnly
+	private int totalCalificaciones; //readOnly
 	private List<Calificacion> calificaciones;
 	private List<Viaje> viajes;
-	public Usuario(String nombre, String documento, String telefono, String email, int totalCalificaciones) {
+	
+	public Usuario(String nombre, String documento, String telefono, String email) {
 		this.nombre = nombre;
 		this.documento = documento;
 		this.telefono = telefono;
@@ -78,16 +78,33 @@ public abstract class Usuario {
 			return false;
 		return true;
 	}
-	public Viaje agregarViaje() {
-		Viaje viaje = new Viaje 
-		return usuario.add.viajes()
+
+	public  void calificarViaje(Calificacion calificacion) {
+		if (calificacion == null) {
+			return; //  Eligió "skip": no se guarda ni se cuenta	    
+		}
+		 calificaciones.add(calificacion);
+		 totalCalificaciones++;
 	}
 	
-	public  abstract calificarViaje(Calificacion calificacion) {
+
+	public  double promedioCalificacion(){
+		if(calificaciones.isEmpty()) {
+			return 0;
+		}
 		
+		double suma = 0;
+		
+		for(Calificacion calificacion: calificaciones) {
+			suma = suma + calificacion.ordinal() + 1;
+		}
+		
+		return suma / calificaciones.size();
 	}
-	public  double promedioCalificacion();
-	
-	
+	@Override
+	public String toString() {
+		return "Usuario [nombre=" + nombre + ", documento=" + documento + ", telefono=" + telefono + ", email=" + email
+				+ ", totalCalificaciones=" + totalCalificaciones + "]";
+	}
 	
 }

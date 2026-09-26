@@ -15,11 +15,6 @@ public class Cliente extends Usuario{
 		Cliente.limiteCalificaciones = limiteCalificaciones;
 	}
 
-	@Override
-	public void calificarViaje(Calificacion calificacion) {
-		// TODO Auto-generated method stub
-		
-	}
-		
+			
 	
 }

@@ -24,11 +24,7 @@ public class Conductor extends Usuario{
 	public String toString() {
 		return "Conductor [disponible=" + disponible + "]";
 	}
-	@Override
-	public void calificarViaje(Calificacion calificacion) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 	
 	
 }
