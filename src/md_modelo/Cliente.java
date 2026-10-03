@@ -21,7 +21,9 @@ public class Cliente {
 			if(viaje.estadoActual() == EstadoViaje.INICIADO )
 				return true;
 		}
+		return false;
 	}
+
 	
 	
 }
