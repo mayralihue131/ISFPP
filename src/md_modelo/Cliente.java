@@ -6,10 +6,10 @@ import java.util.List;
 public class Cliente {
 	private List<Viaje> viajes;
 
-	public Cliente(List<Viaje> viajes) {
-		this.viajes = new ArrayList<Viaje>();
+	public Cliente() {
+		this.viajes = new ArrayList<>();
 	}
-
+	
 	public List<Viaje> getViajes() {
 		return new ArrayList<>(viajes);
 	}	
@@ -21,7 +21,12 @@ public class Cliente {
 			if(viaje.estadoActual() == EstadoViaje.INICIADO )
 				return true;
 		}
+		return false;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "Cliente [viajes=" + viajes + "]";
+	}
 	
 }
