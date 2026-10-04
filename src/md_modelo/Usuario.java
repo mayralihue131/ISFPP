@@ -1,24 +1,20 @@
 package md_modelo;
-import java.util.ArrayList;
-import java.util.List;
 
-public abstract class Usuario {
+public class Usuario {
 	private String nombre;
 	private String telefono;
 	private String email;
 	private Conductor conductor;
 	private Cliente cliente;
 	private RolUsuario rolActivo;
-	
-		
-	public Usuario(String nombre, String telefono, String email, Conductor conductor, Cliente cliente,
-			RolUsuario rolActivo) {
+			
+	public Usuario(String nombre, String telefono, String email) {
 		this.nombre = nombre;
 		this.telefono = telefono;
 		this.email = email;
 		this.conductor = null;
-		this.cliente = cliente;
-		this.rolActivo = rolActivo;
+		this.cliente = new Cliente();
+		this.rolActivo = RolUsuario.CLIENTE;
 	}
 
 	public String getNombre() {
@@ -35,7 +31,7 @@ public abstract class Usuario {
 
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
-	}
+	}//preguntar si es necesario si es un identificador inmutable
 
 	public String getEmail() {
 		return email;
@@ -48,25 +44,13 @@ public abstract class Usuario {
 	public Conductor getConductor() {
 		return conductor;
 	}
-
-	public void setConductor(Conductor conductor) {
-		this.conductor = conductor;
-	}
-
+	
 	public Cliente getCliente() {
 		return cliente;
 	}
 
-	public void setCliente(Cliente cliente) {
-		this.cliente = cliente;
-	}
-
 	public RolUsuario getRolActivo() {
 		return rolActivo;
-	}
-
-	public void setRolActivo(RolUsuario rolActivo) {
-		this.rolActivo = rolActivo;
 	}
 
 	@Override
@@ -94,18 +78,17 @@ public abstract class Usuario {
 		return true;
 	}
 	
-	@Override
-	public String toString() {
-		return "Usuario [nombre=" + nombre + ", telefono=" + telefono + ", email=" + email + ", conductor=" + conductor
-				+ "]";
-	}
-
 	public void altaConductor(String licencia, Vehiculo vehiculo) {
 		return;
 	}
-	public void cambiarRolACtivo(RolUsuario rolNuevo) {
+	public void cambiarRolActivo(RolUsuario rolNuevo) {
 		return ;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "Usuario [nombre=" + nombre + ", telefono=" + telefono + ", email=" + email + ", conductor=" + conductor
+				+ ", cliente=" + cliente + ", rolActivo=" + rolActivo + "]";
+	}
 	
 }
