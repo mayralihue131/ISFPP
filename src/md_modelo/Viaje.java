@@ -123,11 +123,7 @@ public class Viaje {
     }
 
     public List<RegistroViaje> getRegistrosViaje() {
-        return registrosViaje;
-    }
-
-    public void setRegistrosViaje(List<RegistroViaje> registrosViaje) {
-        this.registrosViaje = registrosViaje;
+        return new ArrayList<>(registrosViaje);
     }
 
     public void solicitar(LocalDateTime fechaHora) {
@@ -173,41 +169,122 @@ public class Viaje {
         RegistroViaje registro = new RegistroViaje(fechaHora, EstadoViaje.ACEPTADO);
         this.registrosViaje.add(registro);
     }
-
+    
+    //:))
     /**
      * Inicia el viaje cuando el pasajero sube al vehículo.
      * Esqueleto sin implementar.
      */
     public void iniciar(LocalDateTime fechaHora) {
-        // TODO: Implementar inicio de viaje y cambio de estado a INICIADO
+    		if(fechaHora == null) {
+    			throw new IllegalArgumentException("La fecha y hora no pueden ser nulas");
+    		}
+    		
+    		if (conductor == null || conductor.getConductor() == null) {
+    		    throw new IllegalStateException("El viaje no tiene un conductor habilitado");
+    		}
+    		if (this.estadoActual() == EstadoViaje.INICIADO) {
+            throw new IllegalStateException("El viaje ya está iniciado");
+        }
+    		if (this.estadoActual() != EstadoViaje.ACEPTADO) {
+    		    throw new IllegalStateException("El viaje no está en condiciones de iniciarse");
+    		}
+        RegistroViaje registro = new RegistroViaje(fechaHora, EstadoViaje.INICIADO);
+        this.registrosViaje.add(registro);
+        
     }
-
+    //;(((
     /**
      * Finaliza el viaje y asienta las calificaciones mutuas.
      * Esqueleto sin implementar.
      */
     public void finalizar(LocalDateTime fechaHora, CalificacionViaje calificacionConductor,
             CalificacionViaje calificacionCliente) {
-        // TODO: Implementar finalización, asignación de calificaciones y estado
-        // FINALIZADO
+    	
+    		if(fechaHora == null) {
+    			throw new IllegalArgumentException("La fecha y hora no pueden ser nulas");
+    		}
+    		if(this.estadoActual() != EstadoViaje.INICIADO) {
+            throw new IllegalStateException("El viaje solo puede finalizarse si está INICIADO");
+    		}
+    		if (conductor == null || conductor.getConductor() == null) {
+    		    throw new IllegalArgumentException("El usuario no está habilitado como conductor");
+    		}
+    		
+    		this.calificacionConductor = calificacionConductor;
+    		this.calificacionCliente = calificacionCliente;
+    		
+    		RegistroViaje registro = new RegistroViaje(fechaHora, EstadoViaje.FINALIZADO);
+        this.registrosViaje.add(registro);
+      
     }
 
+    	//:(
     /**
      * Cancela el viaje indicando el usuario y motivo.
      * Esqueleto sin implementar.
      */
     public void cancelar(LocalDateTime fechaHora, Usuario usuario, String motivo) {
-        // TODO: Implementar cancelación, validación de quién cancela y estado CANCELADO
+    	
+    		if(fechaHora == null) {
+    			throw new IllegalArgumentException("La fecha y hora no pueden ser nulas");  			
+    		}
+
+    		if(usuario == null) {
+    			throw new IllegalArgumentException("El usuario no puede ser nulo");  			
+
+    		}
+    		if(motivo == null || motivo.isBlank()) {
+    			throw new IllegalArgumentException("El motivo tiene que ser explicado");  			
+
+    		}
+    		if(this.estadoActual() != EstadoViaje.ACEPTADO) {
+    			throw new IllegalStateException("Se cancela un viaje cuando fue aceptado");  			
+
+    		}
+    		boolean esCliente = usuario.equals(this.cliente);
+    		boolean esConductor = usuario.equals(this.conductor);
+    		
+    		if(!esCliente && !esConductor) {
+    			throw new IllegalArgumentException("Solo puede cancelar el cliente o el conudctor el viaje");  			
+
+    		}
+    		   		
+    		this.motivoCancelacion = motivo;
+    		
+    		if(esCliente) {
+    			this.rolCancela = RolUsuario.CLIENTE;
+    		}else{
+    			this.rolCancela = RolUsuario.CONDUCTOR;
+    		}
+    		RegistroViaje registro = new RegistroViaje(fechaHora, EstadoViaje.CANCELADO);
+    		this.registrosViaje.add(registro);
     }
 
     /**
      * El conductor rechaza el viaje ofrecido.
      * Esqueleto sin implementar.
      */
+    
+    //:)
     public void rechazar(LocalDateTime fechaHora) {
-        // TODO: Implementar rechazo y cambio de estado a RECHAZADO
-    }
+    		if(fechaHora == null) {
+    			throw new IllegalArgumentException("La fecha y hora no pueden ser nulas");
+    		}
+    		if(this.estadoActual() != EstadoViaje.ACEPTADO) {
+    			throw new IllegalStateException("El viaje puede ser rechazado si esta aceptado");
+    		}
+    		
+    		if(this.conductor == null || this.conductor.getConductor() == null) {
+    			throw new IllegalStateException("El viaje tiene que tener un conductor");
 
+    		}
+    		       
+    		RegistroViaje registro = new RegistroViaje(fechaHora,EstadoViaje.RECHAZADO);
+    		this.registrosViaje.add(registro);
+      
+    }
+    
     /**
      * Retorna el estado actual del viaje según el último registro histórico.
      */
