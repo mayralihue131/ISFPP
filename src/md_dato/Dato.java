@@ -1,7 +1,7 @@
 package md_dato;
 
 import java.io.FileNotFoundException;
-import java.util.Map;
+import java.util.List;
 
 import md_modelo.Servicio;
 import md_modelo.Usuario;
@@ -10,14 +10,13 @@ import md_modelo.Vehiculo;
 public class Dato {
 
     /**
-     * Lee vehiculos.txt y crea los vehículos.
+     * Lee vehiculos.txt y devuelve una lista de vehículos.
      * Formato:
      * patente;modelo;capacidad;tipoVehiculo;categoria;tipoServicio;...
      *
      * Ignora líneas vacías y comentarios que comienzan con #.
-     * Devuelve un mapa de vehículos indexado por patente.
      */
-    public static Map<String, Vehiculo> cargarVehiculos(String fileName)
+    public static List<Vehiculo> cargarVehiculos(String fileName)
             throws FileNotFoundException {
 
         // TODO: implementar lectura y creación de vehículos.
@@ -25,16 +24,15 @@ public class Dato {
     }
 
     /**
-     * Lee usuarios.txt y crea los usuarios.
+     * Lee usuarios.txt y devuelve una lista de usuarios.
      * Formato:
      * nombre;telefono;email;licencia;patente;...
      *
-     * Si tiene licencia y vehículos, da de alta su perfil de conductor.
-     * Busca las patentes en el mapa de vehículos previamente cargado.
-     * Devuelve un mapa de usuarios indexado por teléfono.
+     * Si hay licencia y patentes, da de alta el perfil de conductor.
+     * Busca los vehículos en la lista previamente cargada.
      */
-    public static Map<String, Usuario> cargarUsuarios(
-            String fileName, Map<String, Vehiculo> vehiculos)
+    public static List<Usuario> cargarUsuarios(
+            String fileName, List<Vehiculo> vehiculos)
             throws FileNotFoundException {
 
         // TODO: implementar lectura y creación de usuarios.
@@ -42,16 +40,38 @@ public class Dato {
     }
 
     /**
-     * Lee servicios.txt y crea los servicios.
+     * Lee servicios.txt y devuelve una lista de servicios.
      * Formato:
      * nombre;tarifaBase;precioKm;precioMinuto;tipoVehiculo;categoria;tipoServicio
      *
-     * Devuelve un mapa de servicios indexado por nombre.
+     * Ignora líneas vacías y comentarios que comienzan con #.
      */
-    public static Map<String, Servicio> cargarServicios(String fileName)
+    public static List<Servicio> cargarServicios(String fileName)
             throws FileNotFoundException {
 
         // TODO: implementar lectura y creación de servicios.
+        throw new UnsupportedOperationException("Pendiente de implementar");
+    }
+
+    /**
+     * Busca un vehículo por patente recorriendo la lista.
+     * Devuelve null si no existe.
+     */
+    public static Vehiculo buscarVehiculo(
+            String patente, List<Vehiculo> vehiculos) {
+
+        // TODO: implementar búsqueda.
+        throw new UnsupportedOperationException("Pendiente de implementar");
+    }
+
+    /**
+     * Busca un usuario por teléfono recorriendo la lista.
+     * Devuelve null si no existe.
+     */
+    public static Usuario buscarUsuario(
+            String telefono, List<Usuario> usuarios) {
+
+        // TODO: implementar búsqueda.
         throw new UnsupportedOperationException("Pendiente de implementar");
     }
 }
