@@ -1,5 +1,6 @@
 package md_modelo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Vehiculo {
@@ -12,12 +13,12 @@ public class Vehiculo {
 	private Ubicacion ubicacion;
 	
 	public Vehiculo(String patente, String modelo, int capacidadPasajeros, TipoVehiculo tipoVehiculo,
-			List<TipoServicio> tipoServicio, CategoriaVehiculo categoriaVehiculo, Ubicacion ubicacion) {
+			 CategoriaVehiculo categoriaVehiculo, Ubicacion ubicacion) {
 		this.patente = patente;
 		this.modelo = modelo;
 		this.capacidadPasajeros = capacidadPasajeros;
 		this.tipoVehiculo = tipoVehiculo;
-		this.tipoServicio = tipoServicio;
+		this.tipoServicio = new ArrayList<>();
 		this.categoriaVehiculo = categoriaVehiculo;
 		this.ubicacion = ubicacion;
 	}
@@ -46,11 +47,9 @@ public class Vehiculo {
 		this.tipoVehiculo = tipoVehiculo;
 	}
 	public List<TipoServicio> getTipoServicio() {
-		return tipoServicio;
+		return new ArrayList<>(tipoServicio);
 	}
-	public void setTipoServicio(List<TipoServicio> tipoServicio) {
-		this.tipoServicio = tipoServicio;
-	}
+	
 	public CategoriaVehiculo getCategoriaVehiculo() {
 		return categoriaVehiculo;
 	}
@@ -87,14 +86,14 @@ public class Vehiculo {
 			return false;
 		return true;
 	}
+		
+	public void agregarTipoServicio(TipoServicio tipoServicio) {
+		return ;
+	}
 	
 	@Override
 	public String toString() {
 		return "Vehiculo [patente=" + patente + ", modelo=" + modelo + ", capacidadPasajeros=" + capacidadPasajeros
 				+ ", tipoServicio=" + tipoServicio + ", categoriaVehiculo=" + categoriaVehiculo + "]";
 	}
-	public void agregarTipoServicio(TipoServicio tipoServicio) {
-		return ;
-	}
-	
 }

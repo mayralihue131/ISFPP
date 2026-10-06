@@ -77,12 +77,48 @@ public class Usuario {
 			return false;
 		return true;
 	}
-	
+	/**
+	 * Da de alta el perfil de conductor del usuario con una licencia
+	 * y un vehículo inicial.
+	 * La licencia no puede ser null, vacía ni contener solo espacios.
+	 * El vehículo no puede ser null y el usuario no debe tener
+	 * un perfil de conductor previamente.
+	 */
 	public void altaConductor(String licencia, Vehiculo vehiculo) {
-		return;
+	
+		if(vehiculo == null) {
+	        throw new IllegalArgumentException("El vehículo no puede ser null");
+		}
+		
+		if (licencia == null || licencia.isBlank()) {
+	        throw new IllegalArgumentException("La licencia no puede estar vacía");
+	    }
+		
+		if(this.conductor == null) {
+			
+			this.conductor = new Conductor( licencia,  EstadoConductor.FUERA_DE_SERVICIO, vehiculo.getCategoriaVehiculo(),  vehiculo);
+		
+		}else {
+		    throw new IllegalStateException("El usuario ya tiene un perfil de conductor");	
+		}
+
 	}
+	/**
+	 * Cambia el rol activo del usuario a CLIENTE o CONDUCTOR.
+	 * El nuevo rol no puede ser null.
+	 * Para activar el rol CONDUCTOR, el usuario debe tener
+	 * previamente ese perfil.
+	 */
 	public void cambiarRolActivo(RolUsuario rolNuevo) {
-		return ;
+		if(rolNuevo == null) {
+			throw new IllegalArgumentException("El nuevo rol no puede ser null");
+		}
+		
+		if(rolNuevo == RolUsuario.CONDUCTOR && this.conductor == null) {
+			throw new IllegalStateException("El usuario no tiene un perfil de conductor");
+		}
+		
+		this.rolActivo = rolNuevo;
 	}
 
 	@Override

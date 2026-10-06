@@ -18,8 +18,8 @@ public class Conductor{
 		this.vehiculoActivo = vehiculoActivo;
 		this.categoriaVehiculoActivo = categoriaVehiculoActivo;
 		
-		this.viajes = new ArrayList<Viaje>();
-		this.vehiculos = new ArrayList<Vehiculo>();
+		this.viajes = new ArrayList<>();
+		this.vehiculos = new ArrayList<>();
 		
 		this.vehiculos.add(vehiculoActivo);
 
@@ -58,13 +58,19 @@ public class Conductor{
 	public List<Viaje> getViajes() {
 		return new ArrayList<>(viajes);
 	}
-	
+	//metodo implementado
 	public void  agregarVehiculo(Vehiculo vehiculo) {
 		vehiculos.add(vehiculo);
 	}
-	
+	//metodo implementado
 	public void agregarViaje(Viaje viaje) {
 		viajes.add(viaje);
+	}
+	@Override
+	public String toString() {
+		return "Conductor [licenciaConducir=" + licenciaConducir + ", estadoConductor=" + estadoConductor
+				+ ", vehiculos=" + vehiculos + ", categoriaVehiculoActivo=" + categoriaVehiculoActivo
+				+ ", vehiculoActivo=" + vehiculoActivo + ", viajes=" + viajes + "]";
 	}
 	
 }
