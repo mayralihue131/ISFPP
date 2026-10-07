@@ -1,4 +1,4 @@
-package md_modelo;
+package movilidad.modelo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +88,14 @@ public class Vehiculo {
 	}
 		
 	public void agregarTipoServicio(TipoServicio tipoServicio) {
-		return ;
+	    if (tipoServicio == null) {
+	        throw new IllegalArgumentException(
+	                "El tipo de servicio no puede ser null");
+	    }
+
+	    if (!this.tipoServicio.contains(tipoServicio)) {
+	        this.tipoServicio.add(tipoServicio);
+	    }
 	}
 	
 	@Override

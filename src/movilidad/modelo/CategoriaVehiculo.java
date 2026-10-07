@@ -1,4 +1,4 @@
-package md_modelo;
+package movilidad.modelo;
 
 public enum CategoriaVehiculo {
 	ESTANDAR (1),

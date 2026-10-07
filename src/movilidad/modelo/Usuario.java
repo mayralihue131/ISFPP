@@ -1,4 +1,4 @@
-package md_modelo;
+package movilidad.modelo;
 
 public class Usuario {
 	private String nombre;
@@ -53,11 +53,12 @@ public class Usuario {
 		return rolActivo;
 	}
 
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((telefono == null) ? 0 : telefono.hashCode());
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
 		return result;
 	}
 
@@ -70,13 +71,14 @@ public class Usuario {
 		if (getClass() != obj.getClass())
 			return false;
 		Usuario other = (Usuario) obj;
-		if (telefono == null) {
-			if (other.telefono != null)
+		if (email == null) {
+			if (other.email != null)
 				return false;
-		} else if (!telefono.equals(other.telefono))
+		} else if (!email.equals(other.email))
 			return false;
 		return true;
 	}
+
 	/**
 	 * Da de alta el perfil de conductor del usuario con una licencia
 	 * y un vehículo inicial.
