@@ -23,7 +23,15 @@ public class Servicio {
         this.tipoVehiculo = tipoVehiculo;
         this.tipoServicio = tipoServicio;
     }
+    public Servicio(String nombre, double tarifaBase,
+            double precioKm, double precioMinuto,
+            TipoVehiculo tipoVehiculo,
+            CategoriaVehiculo categoriaVehiculo,
+            TipoServicio tipoServicio) {
 
+        this(nombre, tarifaBase, precioKm, precioMinuto,
+                categoriaVehiculo, tipoVehiculo, tipoServicio);
+    }
     public String getNombre() {
         return nombre;
     }

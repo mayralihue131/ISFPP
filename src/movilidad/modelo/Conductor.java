@@ -36,6 +36,10 @@ public class Conductor{
 	public void setEstadoConductor(EstadoConductor estadoConductor) {
 		this.estadoConductor = estadoConductor;
 	}
+	//agregado
+	public void setEstado(EstadoConductor estado) {
+	    setEstadoConductor(estado);
+	}
 	public List<Vehiculo> getVehiculos() {
 		return new ArrayList<>(vehiculos);
 	}

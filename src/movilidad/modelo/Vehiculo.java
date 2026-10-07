@@ -22,6 +22,15 @@ public class Vehiculo {
 		this.categoriaVehiculo = categoriaVehiculo;
 		this.ubicacion = ubicacion;
 	}
+	public Vehiculo(String patente, String modelo, int capacidadPasajeros,
+	        TipoVehiculo tipoVehiculo, CategoriaVehiculo categoriaVehiculo,
+	        TipoServicio tipoServicio) {
+
+	    this(patente, modelo, capacidadPasajeros, tipoVehiculo,
+	            categoriaVehiculo, (Ubicacion) null);
+
+	    agregarTipoServicio(tipoServicio);
+	}
 	public String getPatente() {
 		return patente;
 	}

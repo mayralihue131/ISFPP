@@ -17,13 +17,17 @@ public class Cliente {
 		viajes.add(viaje);
 	}
 	public boolean enViaje() {
-		for(Viaje viaje: viajes) {
-			if(viaje.estadoActual() == EstadoViaje.INICIADO )
-				return true;
-		}
-		return false;
-	}
+	    for (Viaje viaje : viajes) {
+	        EstadoViaje estado = viaje.estadoActual();
 
+	        if (estado == EstadoViaje.SOLICITADO
+	                || estado == EstadoViaje.ACEPTADO
+	                || estado == EstadoViaje.INICIADO) {
+	            return true;
+	        }
+	    }
+	    return false;
+	}
 	@Override
 	public String toString() {
 		return "Cliente [viajes=" + viajes + "]";
