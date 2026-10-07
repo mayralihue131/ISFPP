@@ -1,4 +1,4 @@
-package md_modelo;
+package movilidad.modelo;
 
 public class Servicio {
 
@@ -81,8 +81,13 @@ public class Servicio {
     }
 
     public double calcularCosto(double km, double minutos) {
-        // TODO: Implementar cálculo de costo usando tarifaBase, precioKm y precioMinuto
-        return 0.0;
+        if (!Double.isFinite(km) || !Double.isFinite(minutos)
+                || km < 0 || minutos < 0) {
+            throw new IllegalArgumentException(
+                    "Los kilómetros y minutos deben ser válidos y no negativos");
+        }
+
+        return tarifaBase + precioKm * km + precioMinuto * minutos;
     }
 
     @Override
