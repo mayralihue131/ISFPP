@@ -33,6 +33,11 @@ public class Viaje {
         this.servicio = servicio;
         this.registrosViaje = new ArrayList<>();
     }
+    public Viaje(Usuario cliente, Ubicacion origen,
+            Ubicacion destino, Servicio servicio) {
+
+        this(origen, destino, cliente, servicio);
+    }
 
     public UUID getId() {
         return id;
@@ -125,6 +130,9 @@ public class Viaje {
     public List<RegistroViaje> getRegistrosViaje() {
         return new ArrayList<>(registrosViaje);
     }
+    public List<RegistroViaje> getRegistroViaje() {
+        return getRegistrosViaje();
+    }
 
     public void solicitar(LocalDateTime fechaHora) {
         if (fechaHora == null) {
@@ -142,6 +150,9 @@ public class Viaje {
 
         RegistroViaje registro = new RegistroViaje(fechaHora, EstadoViaje.SOLICITADO);
         this.registrosViaje.add(registro);
+        if (!cliente.getCliente().getViajes().contains(this)) {
+            cliente.getCliente().agregarViaje(this);
+        }
     }
 
     public void aceptar(LocalDateTime fechaHora, Usuario conductor) {
