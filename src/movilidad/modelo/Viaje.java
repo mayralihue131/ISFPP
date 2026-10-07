@@ -238,8 +238,9 @@ public class Viaje {
     			throw new IllegalArgumentException("El motivo tiene que ser explicado");  			
 
     		}
-    		if(this.estadoActual() != EstadoViaje.ACEPTADO) {
-    			throw new IllegalStateException("Se cancela un viaje cuando fue aceptado");  			
+        if (this.estadoActual() != EstadoViaje.SOLICITADO
+                && this.estadoActual() != EstadoViaje.ACEPTADO) {
+            throw new IllegalStateException("El viaje no puede cancelarse en su estado actual");
 
     		}
     		boolean esCliente = usuario.equals(this.cliente);
@@ -271,12 +272,14 @@ public class Viaje {
     		if(fechaHora == null) {
     			throw new IllegalArgumentException("La fecha y hora no pueden ser nulas");
     		}
-    		if(this.estadoActual() != EstadoViaje.ACEPTADO) {
-    			throw new IllegalStateException("El viaje puede ser rechazado si esta aceptado");
+        if (this.estadoActual() != EstadoViaje.SOLICITADO
+                && this.estadoActual() != EstadoViaje.ACEPTADO) {
+            throw new IllegalStateException("El viaje debe estar solicitado o aceptado");
     		}
-    		
-    		if(this.conductor == null || this.conductor.getConductor() == null) {
-    			throw new IllegalStateException("El viaje tiene que tener un conductor");
+
+        if (this.estadoActual() == EstadoViaje.ACEPTADO
+                && (this.conductor == null || this.conductor.getConductor() == null)) {
+            throw new IllegalStateException("El viaje tiene que tener un conductor");
 
     		}
     		       
