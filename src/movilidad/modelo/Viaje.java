@@ -139,11 +139,18 @@ public class Viaje {
             throw new IllegalArgumentException("La fecha y la hora de la solicitud no pueden ser nulas");
         }
 
+        if (cliente == null || cliente.getCliente() == null) {
+            throw new IllegalStateException("El viaje no tiene un cliente valido");
+        }
+
+        if (cliente.getCliente().enViaje()) {
+            throw new IllegalStateException("El cliente ya se encuentra en un viaje");
+        }
+
         if (this.registrosViaje == null) {
             this.registrosViaje = new ArrayList<>();
         }
 
-        // un viaje solo puede ser solicitado si aún no tiene registros
         if (!this.registrosViaje.isEmpty()) {
             throw new IllegalStateException("El viaje ya ha sido solicitado previamente");
         }
@@ -160,6 +167,9 @@ public class Viaje {
         if (fechaHora == null) {
             throw new IllegalArgumentException("La fecha y hora no pueden ser nulas");
         }
+        if (conductor == null) {
+            throw new IllegalArgumentException("El conductor no puede ser nulo");
+        }
         if (conductor.getConductor() == null) {
             throw new IllegalArgumentException("El usuario no esta habilitado como conductor");
         }
@@ -172,45 +182,57 @@ public class Viaje {
             throw new IllegalStateException("El conductor no puede ser el mismo usuario que solicito el viaje");
         }
 
-        if (conductor.getConductor().getVehiculoActivo() != null) {
-            this.vehiculo = conductor.getConductor().getVehiculoActivo();
+        if (conductor.getConductor().getEstadoConductor() != EstadoConductor.DISPONIBLE) {
+            throw new IllegalStateException("El conductor no esta disponible");
         }
 
+        Vehiculo vehiculoActivo = conductor.getConductor().getVehiculoActivo();
+        if (vehiculoActivo == null) {
+            throw new IllegalStateException("El conductor no tiene un vehiculo activo");
+        }
+
+        if (servicio == null || servicio.getCategoriaVehiculo() == null
+                || conductor.getConductor().getCategoriaVehiculoActivo() == null
+                || conductor.getConductor().getCategoriaVehiculoActivo().getCodigo()
+                        < servicio.getCategoriaVehiculo().getCodigo()) {
+            throw new IllegalStateException("El vehiculo no cumple la categoria requerida");
+        }
+
+        this.vehiculo = vehiculoActivo;
         this.conductor = conductor;
         RegistroViaje registro = new RegistroViaje(fechaHora, EstadoViaje.ACEPTADO);
         this.registrosViaje.add(registro);
+        conductor.getConductor().setEstadoConductor(EstadoConductor.VIAJE_A_ORIGEN);
     }
-    
-    //:))
-    /**
-     * Inicia el viaje cuando el pasajero sube al vehículo.
-     * Esqueleto sin implementar.
-     */
+
     public void iniciar(LocalDateTime fechaHora) {
-    		if(fechaHora == null) {
-    			throw new IllegalArgumentException("La fecha y hora no pueden ser nulas");
-    		}
+
+    	if(fechaHora == null) {
+    		throw new IllegalArgumentException("La fecha y hora no pueden ser nulas");
+    	}
     		
-    		if (conductor == null || conductor.getConductor() == null) {
-    		    throw new IllegalStateException("El viaje no tiene un conductor habilitado");
-    		}
-    		if (this.estadoActual() == EstadoViaje.INICIADO) {
+    	if (conductor == null || conductor.getConductor() == null) {
+    	    throw new IllegalStateException("El viaje no tiene un conductor habilitado");
+    	}
+    	if (this.estadoActual() == EstadoViaje.INICIADO) {
             throw new IllegalStateException("El viaje ya está iniciado");
         }
-    		if (this.estadoActual() != EstadoViaje.ACEPTADO) {
-    		    throw new IllegalStateException("El viaje no está en condiciones de iniciarse");
-    		}
+    	
+        if (this.estadoActual() != EstadoViaje.ACEPTADO) {
+    	    throw new IllegalStateException("El viaje no está en condiciones de iniciarse");
+    	}
+
+        if (conductor.getConductor().getEstadoConductor() != EstadoConductor.VIAJE_A_ORIGEN) {
+            throw new IllegalStateException("El conductor no esta viajando al origen");
+        }
+
         RegistroViaje registro = new RegistroViaje(fechaHora, EstadoViaje.INICIADO);
         this.registrosViaje.add(registro);
-        
+        conductor.getConductor().setEstadoConductor(EstadoConductor.VIAJE_A_DESTINO);
     }
-    //;(((
-    /**
-     * Finaliza el viaje y asienta las calificaciones mutuas.
-     * Esqueleto sin implementar.
-     */
-    public void finalizar(LocalDateTime fechaHora, CalificacionViaje calificacionConductor,
-            CalificacionViaje calificacionCliente) {
+
+    public void finalizar(LocalDateTime fechaHora, CalificacionViaje calificacionCliente,
+            CalificacionViaje calificacionConductor) {
     	
     		if(fechaHora == null) {
     			throw new IllegalArgumentException("La fecha y hora no pueden ser nulas");
@@ -227,14 +249,10 @@ public class Viaje {
     		
     		RegistroViaje registro = new RegistroViaje(fechaHora, EstadoViaje.FINALIZADO);
         this.registrosViaje.add(registro);
+        conductor.getConductor().setEstadoConductor(EstadoConductor.DISPONIBLE);
       
     }
 
-    	//:(
-    /**
-     * Cancela el viaje indicando el usuario y motivo.
-     * Esqueleto sin implementar.
-     */
     public void cancelar(LocalDateTime fechaHora, Usuario usuario, String motivo) {
     	
     		if(fechaHora == null) {
@@ -271,14 +289,11 @@ public class Viaje {
     		}
     		RegistroViaje registro = new RegistroViaje(fechaHora, EstadoViaje.CANCELADO);
     		this.registrosViaje.add(registro);
+        if (this.conductor != null && this.conductor.getConductor() != null) {
+            this.conductor.getConductor().setEstadoConductor(EstadoConductor.DISPONIBLE);
+        }
     }
-
-    /**
-     * El conductor rechaza el viaje ofrecido.
-     * Esqueleto sin implementar.
-     */
     
-    //:)
     public void rechazar(LocalDateTime fechaHora) {
     		if(fechaHora == null) {
     			throw new IllegalArgumentException("La fecha y hora no pueden ser nulas");
@@ -298,10 +313,7 @@ public class Viaje {
     		this.registrosViaje.add(registro);
       
     }
-    
-    /**
-     * Retorna el estado actual del viaje según el último registro histórico.
-     */
+
     public EstadoViaje estadoActual() {
         if (registrosViaje == null || registrosViaje.isEmpty()) {
             return null;
