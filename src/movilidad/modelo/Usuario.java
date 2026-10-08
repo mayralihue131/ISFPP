@@ -31,7 +31,7 @@ public class Usuario {
 
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
-	}//preguntar si es necesario si es un identificador inmutable
+	}
 
 	public String getEmail() {
 		return email;
@@ -79,13 +79,6 @@ public class Usuario {
 		return true;
 	}
 
-	/**
-	 * Da de alta el perfil de conductor del usuario con una licencia
-	 * y un vehículo inicial.
-	 * La licencia no puede ser null, vacía ni contener solo espacios.
-	 * El vehículo no puede ser null y el usuario no debe tener
-	 * un perfil de conductor previamente.
-	 */
 	public void altaConductor(String licencia, Vehiculo vehiculo) {
 	
 		if(vehiculo == null) {
@@ -105,19 +98,28 @@ public class Usuario {
 		}
 
 	}
-	/**
-	 * Cambia el rol activo del usuario a CLIENTE o CONDUCTOR.
-	 * El nuevo rol no puede ser null.
-	 * Para activar el rol CONDUCTOR, el usuario debe tener
-	 * previamente ese perfil.
-	 */
+
 	public void cambiarRolActivo(RolUsuario rolNuevo) {
-		if(rolNuevo == null) {
+		if (rolNuevo == null) {
 			throw new IllegalArgumentException("El nuevo rol no puede ser null");
 		}
 		
-		if(rolNuevo == RolUsuario.CONDUCTOR && this.conductor == null) {
-			throw new IllegalStateException("El usuario no tiene un perfil de conductor");
+		if (rolNuevo == RolUsuario.CONDUCTOR) {
+			if (this.conductor == null) {
+				throw new IllegalStateException("El usuario no tiene un perfil de conductor");
+			}
+			if (this.cliente.enViaje()) {
+				throw new IllegalStateException("El cliente tiene un viaje activo");
+			}
+			if (this.conductor.getEstadoConductor() != EstadoConductor.FUERA_DE_SERVICIO) {
+				throw new IllegalStateException("El conductor debe estar fuera de servicio");
+			}
+		}
+
+		if (rolNuevo == RolUsuario.CLIENTE
+				&& this.rolActivo == RolUsuario.CONDUCTOR
+				&& this.conductor != null) {
+			this.conductor.setEstadoConductor(EstadoConductor.FUERA_DE_SERVICIO);
 		}
 		
 		this.rolActivo = rolNuevo;

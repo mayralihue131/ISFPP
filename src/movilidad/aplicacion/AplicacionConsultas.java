@@ -84,7 +84,7 @@ public class AplicacionConsultas {
                     Integer.parseInt(fila.get(2)),
                     TipoVehiculo.valueOf(fila.get(3)),
                     CategoriaVehiculo.valueOf(fila.get(4)),
-                    null);
+                    (Ubicacion) null);
 
             for (int i = 5; i < fila.size(); i++) {
                 if (!fila.get(i).isBlank()) {
