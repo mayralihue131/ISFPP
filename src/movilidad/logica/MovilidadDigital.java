@@ -32,21 +32,20 @@ public class MovilidadDigital {
         return new ArrayList<>(servicios);
     }
 
-    // Registrar un usuario y evitar duplicados.
+ // Registrar un usuario y evitar duplicados.
     public void agregarUsuario(Usuario usuario) {
         if (usuario == null) {
             throw new IllegalArgumentException("El usuario no puede ser null");
         }
-
-        String email = usuario.getEmail();
-        if (email == null || email.isBlank()) {
+        if (usuario.getEmail() == null || usuario.getEmail().isBlank()) {
             throw new IllegalArgumentException("El email no puede estar vacío");
         }
 
-        if (buscarUsuarioPorMail(email) != null) {
-            throw new IllegalArgumentException("Ya existe un usuario con ese email");
+        for (Usuario usuarioRegistrado : usuarios) {
+            if (usuario.getEmail().equals(usuarioRegistrado.getEmail())) {
+                throw new IllegalArgumentException("Ya existe un usuario con ese email");
+            }
         }
-
         usuarios.add(usuario);
     }
 
@@ -56,191 +55,271 @@ public class MovilidadDigital {
             return null;
         }
         for (Usuario usuario : usuarios) {
-            if (usuario.getEmail() != null && usuario.getEmail().equalsIgnoreCase(mail.trim())) {
+            if (usuario.getEmail() != null && usuario.getEmail().equals(mail)) {
                 return usuario;
             }
         }
         return null;
     }
 
-    // Método auxiliar para reutilizar la búsqueda y validación en toda la clase
-    private Usuario obtenerUsuarioRegistrado(Usuario usuario) {
+    // Habilitar al usuario como conductor con su primer vehículo.
+    public void registrarConductor(Usuario usuario, String licencia, Vehiculo vehiculo) {
         if (usuario == null) {
             throw new IllegalArgumentException("El usuario no puede ser null");
         }
         if (usuario.getEmail() == null || usuario.getEmail().isBlank()) {
             throw new IllegalArgumentException("El email no puede estar vacío");
         }
-        Usuario registrado = buscarUsuarioPorMail(usuario.getEmail());
-        if (registrado == null) {
-            throw new IllegalArgumentException("El usuario no está registrado");
-        }
-        return registrado;
-    }
-
-    // Habilitar al usuario como conductor con su primer vehículo.
-    public void registrarConductor(Usuario usuario, String licencia, Vehiculo vehiculo) {
-        Usuario registrado = obtenerUsuarioRegistrado(usuario);
-
         if (licencia == null || licencia.isBlank()) {
             throw new IllegalArgumentException("La licencia no puede estar vacía");
         }
         if (vehiculo == null) {
-            throw new IllegalArgumentException("El vehículo no puede ser null");
-        }
-        if (registrado.getConductor() != null) {
-            throw new IllegalStateException("El usuario ya es conductor");
+            throw new IllegalArgumentException("El vehiculo no puede ser null");
         }
 
-        registrado.altaConductor(licencia, vehiculo);
+        for (Usuario usuarioRegistrado : usuarios) {
+            if (usuario.getEmail().equals(usuarioRegistrado.getEmail())) {
+                if (usuarioRegistrado.getConductor() != null) {
+                    throw new IllegalStateException("El usuario ya es conductor");
+                }
+                usuarioRegistrado.altaConductor(licencia, vehiculo);
+                return;
+            }
+        }
+
+        throw new IllegalArgumentException("El usuario no está registrado");
     }
 
     // Agregar un vehículo al conductor del usuario.
     public void agregarVehiculo(Usuario usuario, Vehiculo vehiculo) {
-        Usuario registrado = obtenerUsuarioRegistrado(usuario);
-
+        if (usuario == null) {
+            throw new IllegalArgumentException("El usuario no puede ser null");
+        }
+        if (usuario.getEmail() == null || usuario.getEmail().isBlank()) {
+            throw new IllegalArgumentException("El email no puede estar vacío");
+        }
         if (vehiculo == null) {
-            throw new IllegalArgumentException("El vehículo no puede ser null");
-        }
-        if (registrado.getConductor() == null) {
-            throw new IllegalArgumentException("El usuario no es conductor");
+            throw new IllegalArgumentException("El vehiculo no puede ser null");
         }
 
-        registrado.getConductor().agregarVehiculo(vehiculo);
+        for (Usuario usuarioRegistrado : usuarios) {
+            if (usuario.getEmail().equals(usuarioRegistrado.getEmail())) {
+                if (usuarioRegistrado.getConductor() == null) {
+                    throw new IllegalArgumentException("El usuario no es conductor");
+                }
+                if (usuarioRegistrado.getConductor().getVehiculos().contains(vehiculo)) {
+                    throw new IllegalArgumentException("El conductor ya tiene registrado este vehículo");
+                }
+                usuarioRegistrado.getConductor().agregarVehiculo(vehiculo);
+                return;
+            }
+        }
+
+        throw new IllegalArgumentException("El usuario no está registrado");
     }
 
     // Agregar PASAJEROS o ENVIOS a un vehículo del conductor.
     public void agregarTipoServicioVehiculo(Usuario usuario, Vehiculo vehiculo, TipoServicio tipoServicio) {
-        Usuario registrado = obtenerUsuarioRegistrado(usuario);
-
+        if (usuario == null) {
+            throw new IllegalArgumentException("El usuario no puede ser null");
+        }
+        if (usuario.getEmail() == null || usuario.getEmail().isBlank()) {
+            throw new IllegalArgumentException("El email no puede estar vacío");
+        }
         if (vehiculo == null) {
-            throw new IllegalArgumentException("El vehículo no puede estar vacío");
+            throw new IllegalArgumentException("El vehiculo no puede estar vacio");
         }
         if (tipoServicio == null) {
             throw new IllegalArgumentException("No puede ser null el tipo de servicio es envio o pasajeros");
         }
 
-        Conductor conductor = registrado.getConductor();
-        if (conductor == null) {
-            throw new IllegalStateException("El usuario no es conductor");
-        }
+        for (Usuario usuarioRegistrado : usuarios) {
+            if (usuarioRegistrado.getEmail().equals(usuario.getEmail())) {
+                Conductor conductor = usuarioRegistrado.getConductor();
 
-        for (Vehiculo vehiculoRegistrado : conductor.getVehiculos()) {
-            if (vehiculoRegistrado.equals(vehiculo)) {
-                vehiculoRegistrado.agregarTipoServicio(tipoServicio);
-                return;
+                if (conductor == null) {
+                    throw new IllegalStateException("El usuario no es conductor");
+                }
+
+                for (Vehiculo vehiculoRegistrado : conductor.getVehiculos()) {
+                    if (vehiculoRegistrado.equals(vehiculo)) {
+                        vehiculoRegistrado.agregarTipoServicio(tipoServicio);
+                        return;
+                    }
+                }
+
+                throw new IllegalArgumentException("El vehículo no pertenece al conductor");
             }
         }
 
-        throw new IllegalArgumentException("El vehículo no pertenece al conductor");
+        throw new IllegalArgumentException("El usuario no está registrado");
     }
 
+    // Elegir un vehículo propio cuando no haya un viaje en curso.
     public void seleccionarVehiculoActivo(Usuario usuario, Vehiculo vehiculo) {
-        Usuario registrado = obtenerUsuarioRegistrado(usuario);
-
+        if (usuario == null) {
+            throw new IllegalArgumentException("El usuario no puede ser null");
+        }
+        if (usuario.getEmail() == null || usuario.getEmail().isBlank()) {
+            throw new IllegalArgumentException("El email no puede estar vacío");
+        }
         if (vehiculo == null) {
-            throw new IllegalArgumentException("El vehículo no puede ser null");
+            throw new IllegalArgumentException("El vehiculo no puede ser null");
         }
 
-        Conductor conductor = registrado.getConductor();
-        if (conductor == null) {
-            throw new IllegalStateException("El usuario no es conductor");
-        }
+        for (Usuario usuarioRegistrado : usuarios) {
+            if (usuarioRegistrado.getEmail().equals(usuario.getEmail())) {
+                Conductor conductor = usuarioRegistrado.getConductor();
+                if (conductor == null) {
+                    throw new IllegalStateException("El usuario no es conductor");
+                }
 
-        EstadoConductor estadoActual = conductor.getEstadoConductor();
-        if (estadoActual == EstadoConductor.VIAJE_A_ORIGEN || estadoActual == EstadoConductor.VIAJE_A_DESTINO) {
-            throw new IllegalStateException("No puede cambiar de vehículo durante un viaje");
-        }
+                EstadoConductor estadoActual = conductor.getEstadoConductor();
+                if (estadoActual == EstadoConductor.VIAJE_A_ORIGEN || estadoActual == EstadoConductor.VIAJE_A_DESTINO) {
+                    throw new IllegalStateException("No puede cambiar de vehículo durante un viaje");
+                }
 
-        for (Vehiculo vehiculoRegistrado : conductor.getVehiculos()) {
-            if (vehiculoRegistrado.equals(vehiculo)) {
-                conductor.setVehiculoActivo(vehiculoRegistrado);
-                return;
+                for (Vehiculo vehiculoRegistrado : conductor.getVehiculos()) {
+                    if (vehiculoRegistrado.equals(vehiculo)) {
+                        conductor.setVehiculoActivo(vehiculoRegistrado);
+                        return;
+                    }
+                }
+
+                throw new IllegalArgumentException("El vehículo no pertenece al conductor");
             }
         }
 
-        throw new IllegalArgumentException("El vehículo no pertenece al conductor");
+        throw new IllegalArgumentException("El usuario no está registrado");
     }
 
     // Definir hasta qué categoría menor acepta solicitudes.
     public void definirCategoriaAceptada(Usuario usuario, CategoriaVehiculo categoria) {
-        Usuario registrado = obtenerUsuarioRegistrado(usuario);
-
+        if (usuario == null) {
+            throw new IllegalArgumentException("El usuario no puede ser null");
+        }
+        if (usuario.getEmail() == null || usuario.getEmail().isBlank()) {
+            throw new IllegalArgumentException("El email no puede estar vacío");
+        }
         if (categoria == null) {
             throw new IllegalArgumentException("La categoría no puede ser null");
         }
 
-        Conductor conductor = registrado.getConductor();
-        if (conductor == null) {
-            throw new IllegalStateException("El usuario no es conductor");
+        for (Usuario usuarioRegistrado : usuarios) {
+            if (usuarioRegistrado.getEmail().equals(usuario.getEmail())) {
+                Conductor conductor = usuarioRegistrado.getConductor();
+                if (conductor == null) {
+                    throw new IllegalStateException("El usuario no es conductor");
+                }
+
+                EstadoConductor estadoActual = conductor.getEstadoConductor();
+                if (estadoActual == EstadoConductor.VIAJE_A_ORIGEN || estadoActual == EstadoConductor.VIAJE_A_DESTINO) {
+                    throw new IllegalStateException("No puede modificar la categoría aceptada durante un viaje");
+                }
+
+                Vehiculo vehiculoActivo = conductor.getVehiculoActivo();
+                if (vehiculoActivo == null || vehiculoActivo.getCategoriaVehiculo() == null) {
+                    throw new IllegalStateException("El conductor necesita un vehículo activo con categoría");
+                }
+
+                if (categoria.getCodigo() > vehiculoActivo.getCategoriaVehiculo().getCodigo()) {
+                    throw new IllegalArgumentException("La categoría aceptada no puede superar la del vehículo");
+                }
+
+                conductor.setCategoriaVehiculoActivo(categoria);
+                return;
+            }
         }
 
-        Vehiculo vehiculo = conductor.getVehiculoActivo();
-        if (vehiculo == null || vehiculo.getCategoriaVehiculo() == null) {
-            throw new IllegalStateException("El conductor necesita un vehículo activo con categoría");
-        }
-
-        if (categoria.getCodigo() > vehiculo.getCategoriaVehiculo().getCodigo()) {
-            throw new IllegalArgumentException("La categoría aceptada no puede superar la del vehículo");
-        }
-
-        conductor.setCategoriaVehiculoActivo(categoria);
+        throw new IllegalArgumentException("El usuario no está registrado");
     }
 
     // Validar conductor, licencia y vehículo activo.
     public void ponerDisponible(Usuario usuario) {
-        Usuario registrado = obtenerUsuarioRegistrado(usuario);
-        Conductor conductor = registrado.getConductor();
-
-        if (conductor == null) {
-            throw new IllegalStateException("El usuario no es conductor");
+        if (usuario == null) {
+            throw new IllegalArgumentException("El usuario no puede ser null");
         }
-        if (conductor.getVehiculoActivo() == null) {
-            throw new IllegalStateException("El conductor no tiene un vehículo activo");
+        if (usuario.getEmail() == null || usuario.getEmail().isBlank()) {
+            throw new IllegalArgumentException("El email no puede estar vacío");
         }
 
-        String licencia = conductor.getLicenciaConducir();
-        if (licencia == null || licencia.isBlank()) {
-            throw new IllegalStateException("El conductor no tiene una licencia válida");
+        for (Usuario usuarioRegistrado : usuarios) {
+            if (usuarioRegistrado.getEmail().equals(usuario.getEmail())) {
+                Conductor conductor = usuarioRegistrado.getConductor();
+                if (conductor == null) {
+                    throw new IllegalStateException("El usuario no es conductor");
+                }
+                if (conductor.getVehiculoActivo() == null) {
+                    throw new IllegalStateException("El conductor no tiene un vehículo activo");
+                }
+                String licencia = conductor.getLicenciaConducir();
+                if (licencia == null || licencia.isBlank()) {
+                    throw new IllegalStateException("El conductor no tiene una licencia válida");
+                }
+                EstadoConductor estadoActual = conductor.getEstadoConductor();
+
+                if (estadoActual == EstadoConductor.VIAJE_A_ORIGEN || estadoActual == EstadoConductor.VIAJE_A_DESTINO) {
+                    throw new IllegalStateException("El conductor tiene un viaje en curso");
+                }
+
+                conductor.setEstadoConductor(EstadoConductor.DISPONIBLE);
+                return;
+            }
         }
 
-        EstadoConductor estadoActual = conductor.getEstadoConductor();
-        if (estadoActual == EstadoConductor.VIAJE_A_ORIGEN || estadoActual == EstadoConductor.VIAJE_A_DESTINO) {
-            throw new IllegalStateException("El conductor tiene un viaje en curso");
-        }
-
-        conductor.setEstadoConductor(EstadoConductor.DISPONIBLE);
+        throw new IllegalArgumentException("El usuario no está registrado");
     }
 
     // Dejar de recibir solicitudes si no tiene un viaje en curso.
     public void ponerFueraDeServicio(Usuario usuario) {
-        Usuario registrado = obtenerUsuarioRegistrado(usuario);
-        Conductor conductor = registrado.getConductor();
-
-        if (conductor == null) {
-            throw new IllegalStateException("El usuario no es conductor");
+        if (usuario == null) {
+            throw new IllegalArgumentException("El usuario no puede estar vacio");
+        }
+        if (usuario.getEmail() == null || usuario.getEmail().isBlank()) {
+            throw new IllegalArgumentException("El email no puede estar vacío");
         }
 
-        EstadoConductor estadoActual = conductor.getEstadoConductor();
-        if (estadoActual == EstadoConductor.VIAJE_A_ORIGEN || estadoActual == EstadoConductor.VIAJE_A_DESTINO) {
-            throw new IllegalStateException("El conductor tiene un viaje en curso");
+        for (Usuario usuarioRegistrado : usuarios) {
+            if (usuario.getEmail().equals(usuarioRegistrado.getEmail())) {
+                Conductor conductor = usuarioRegistrado.getConductor();
+                if (conductor == null) {
+                    throw new IllegalStateException("El usuario no es conductor");
+                }
+                EstadoConductor estadoActual = conductor.getEstadoConductor();
+                if (estadoActual == EstadoConductor.VIAJE_A_ORIGEN || estadoActual == EstadoConductor.VIAJE_A_DESTINO) {
+                    throw new IllegalStateException("El conductor tiene un viaje en curso");
+                }
+                conductor.setEstadoConductor(EstadoConductor.FUERA_DE_SERVICIO);
+                return;
+            }
         }
 
-        conductor.setEstadoConductor(EstadoConductor.FUERA_DE_SERVICIO);
+        throw new IllegalArgumentException("El usuario no está registrado");
     }
 
     // Cambiar el rol activo del usuario.
     public void cambiarRolActivo(Usuario usuario, RolUsuario rol) {
-        Usuario registrado = obtenerUsuarioRegistrado(usuario);
-
+        if (usuario == null) {
+            throw new IllegalArgumentException("El usuario no puede ser null");
+        }
+        if (usuario.getEmail() == null || usuario.getEmail().isBlank()) {
+            throw new IllegalArgumentException("El email no puede estar vacío");
+        }
         if (rol == null) {
             throw new IllegalArgumentException("El rol no puede ser null");
         }
-        if (rol == RolUsuario.CONDUCTOR && registrado.getConductor() == null) {
-            throw new IllegalStateException("El usuario no es conductor");
+
+        for (Usuario usuarioRegistro : usuarios) {
+            if (usuario.getEmail().equals(usuarioRegistro.getEmail())) {
+                if (rol == RolUsuario.CONDUCTOR && usuarioRegistro.getConductor() == null) {
+                    throw new IllegalStateException("El usuario no es conductor");
+                }
+                usuarioRegistro.cambiarRolActivo(rol);
+                return;
+            }
         }
 
-        registrado.cambiarRolActivo(rol);
+        throw new IllegalArgumentException("El usuario no está registrado");
     }
 
     public void agregarServicio(Servicio servicio) {
@@ -254,7 +333,7 @@ public class MovilidadDigital {
         }
 
         for (Servicio registrado : servicios) {
-            if (nombre.equalsIgnoreCase(registrado.getNombre())) {
+            if (nombre.equals(registrado.getNombre())) {
                 throw new IllegalArgumentException("El servicio ya está registrado");
             }
         }
@@ -274,18 +353,23 @@ public class MovilidadDigital {
                 resultado.add(servicio);
             }
         }
+
         return resultado;
     }
 
     // Estimar los minutos de recorrido usando la distancia entre ubicaciones
     public double estimarTiempo(Servicio servicio, Ubicacion origen, Ubicacion destino) {
-        if (origen == null || destino == null) {
-            throw new IllegalArgumentException("Las ubicaciones no pueden ser nulas");
+        if (servicio == null || origen == null || destino == null) {
+            throw new IllegalArgumentException("El servicio, origen y destino no pueden ser null");
         }
-        // Ejemplo base: distancia dividida por velocidad estimada promedio (ej. 40 km/h) * 60 minutos
+
         double distanciaKm = origen.calcularDistancia(destino);
-        return (distanciaKm / 40.0) * 60.0;
+        double velocidadPromedioKmH = 40.0;
+        return (distanciaKm / velocidadPromedioKmH) * 60.0;
     }
+	
+    
+    //hasta aca 
 
     // Crear la solicitud y asociarla al cliente.
     public Viaje solicitarViaje(Usuario cliente, Servicio servicio, Ubicacion origen, Ubicacion destino, LocalDateTime fechaHora) {
@@ -324,6 +408,7 @@ public class MovilidadDigital {
         return disponibles;
     }
 
+    
     // Obtener las solicitudes que un conductor puede aceptar.
     public List<Viaje> obtenerSolicitudesDisponibles(Usuario conductor) {
         if (conductor == null || conductor.getConductor() == null) {
@@ -337,7 +422,7 @@ public class MovilidadDigital {
         }
         return solicitudes;
     }
-
+        
     // Aceptar una solicitud todavía libre y comenzar el viaje al origen.
     public void aceptarViaje(UUID idViaje, Usuario conductor, LocalDateTime fechaHora) {
         Viaje viaje = viajeRequerido(idViaje);
