@@ -3,27 +3,31 @@ package movilidad.test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import md_logica.MovilidadDigital;
-import md_modelo.CategoriaVehiculo;
-import md_modelo.EstadoConductor;
-import md_modelo.EstadoViaje;
-import md_modelo.Servicio;
-import md_modelo.TipoServicio;
-import md_modelo.TipoVehiculo;
-import md_modelo.Ubicacion;
-import md_modelo.Usuario;
-import md_modelo.Vehiculo;
-import md_modelo.Viaje;
+import movilidad.logica.MovilidadDigital;
+import movilidad.modelo.CalificacionViaje;
+import movilidad.modelo.CategoriaVehiculo;
+import movilidad.modelo.EstadoConductor;
+import movilidad.modelo.EstadoViaje;
+import movilidad.modelo.RolUsuario;
+import movilidad.modelo.Servicio;
+import movilidad.modelo.TipoServicio;
+import movilidad.modelo.TipoVehiculo;
+import movilidad.modelo.Ubicacion;
+import movilidad.modelo.Usuario;
+import movilidad.modelo.Vehiculo;
+import movilidad.modelo.Viaje;
 
 class MovilidadDigitalTest {
 
@@ -54,10 +58,11 @@ class MovilidadDigitalTest {
     }
 
     @Test
-    void registraUsuariosYEvitaDuplicadosPorTelefono() {
-        movilidad.agregarUsuario(cliente);
+    void registraUsuariosYEvitaDuplicadosPorEmail() {
         assertEquals(2, movilidad.getUsuarios().size());
-        assertSame(cliente, movilidad.buscarUsuarioPorTelefono("111"));
+        assertSame(cliente, movilidad.buscarUsuarioPorMail("cliente@mail.com"));
+        assertThrows(IllegalArgumentException.class, () -> movilidad.agregarUsuario(
+                new Usuario("Otro cliente", "333", "cliente@mail.com")));
     }
 
     @Test
@@ -83,10 +88,46 @@ class MovilidadDigitalTest {
 
         movilidad.iniciarViaje(viaje.getId(), conductor, INICIO.plusMinutes(5));
         assertEquals(EstadoViaje.INICIADO, viaje.estadoActual());
+        assertEquals(EstadoConductor.VIAJE_A_DESTINO,
+                conductor.getConductor().getEstadoConductor());
 
         movilidad.finalizarViaje(viaje.getId(), conductor, INICIO.plusMinutes(20));
         assertEquals(EstadoViaje.FINALIZADO, viaje.estadoActual());
+
+        movilidad.calificarConductor(viaje.getId(), cliente,
+                CalificacionViaje.EXCELENTE);
+        movilidad.calificarCliente(viaje.getId(), conductor,
+                CalificacionViaje.MUY_BUENO);
+        assertEquals(CalificacionViaje.EXCELENTE,
+                viaje.getCalificacionConductor());
+        assertEquals(CalificacionViaje.MUY_BUENO,
+                viaje.getCalificacionCliente());
         assertEquals(EstadoConductor.DISPONIBLE,
+                conductor.getConductor().getEstadoConductor());
+    }
+
+    @Test
+    void administraEstadoDelConductorYConfiguracionDelVehiculo() {
+        assertEquals(RolUsuario.CLIENTE, conductor.getRolActivo());
+        assertEquals(EstadoConductor.DISPONIBLE,
+                conductor.getConductor().getEstadoConductor());
+
+        movilidad.ponerFueraDeServicio(conductor);
+        assertEquals(EstadoConductor.FUERA_DE_SERVICIO,
+                conductor.getConductor().getEstadoConductor());
+
+        movilidad.definirCategoriaAceptada(conductor,
+                CategoriaVehiculo.ESTANDAR);
+        movilidad.ponerDisponible(conductor);
+        assertEquals(EstadoConductor.DISPONIBLE,
+                conductor.getConductor().getEstadoConductor());
+
+        movilidad.ponerFueraDeServicio(conductor);
+        movilidad.cambiarRolActivo(conductor, RolUsuario.CONDUCTOR);
+        assertEquals(RolUsuario.CONDUCTOR, conductor.getRolActivo());
+        movilidad.cambiarRolActivo(conductor, RolUsuario.CLIENTE);
+        assertEquals(RolUsuario.CLIENTE, conductor.getRolActivo());
+        assertEquals(EstadoConductor.FUERA_DE_SERVICIO,
                 conductor.getConductor().getEstadoConductor());
     }
 
@@ -113,9 +154,24 @@ class MovilidadDigitalTest {
     }
 
     @Test
+    void cancelarViajeAceptadoCalculaCostoYLiberaAlConductor() {
+        Viaje viaje = solicitarViaje();
+        movilidad.aceptarViaje(viaje.getId(), conductor, INICIO.plusMinutes(1));
+
+        double costo = movilidad.cancelarViaje(viaje.getId(), cliente,
+                INICIO.plusMinutes(3), "Cambio de planes", 2.0);
+
+        assertTrue(costo > 0);
+        assertEquals(EstadoViaje.CANCELADO, viaje.estadoActual());
+        assertEquals(EstadoConductor.DISPONIBLE,
+                conductor.getConductor().getEstadoConductor());
+    }
+
+    @Test
     void rechazaOperacionesConViajeInexistente() {
         assertThrows(IllegalArgumentException.class,
                 () -> movilidad.iniciarViaje(null, conductor, INICIO));
+        assertNull(movilidad.buscarViajePorId(UUID.randomUUID()));
     }
 
     @Test

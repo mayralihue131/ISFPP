@@ -31,7 +31,7 @@ public class Usuario {
 
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
-	}//preguntar si es necesario si es un identificador inmutable
+	}
 
 	public String getEmail() {
 		return email;
@@ -79,13 +79,6 @@ public class Usuario {
 		return true;
 	}
 
-	/**
-	 * Da de alta el perfil de conductor del usuario con una licencia
-	 * y un vehículo inicial.
-	 * La licencia no puede ser null, vacía ni contener solo espacios.
-	 * El vehículo no puede ser null y el usuario no debe tener
-	 * un perfil de conductor previamente.
-	 */
 	public void altaConductor(String licencia, Vehiculo vehiculo) {
 	
 		if(vehiculo == null) {
