@@ -98,7 +98,6 @@ public class Usuario {
 		}
 
 	}
-
 	public void cambiarRolActivo(RolUsuario rolNuevo) {
 		if (rolNuevo == null) {
 			throw new IllegalArgumentException("El nuevo rol no puede ser null");
