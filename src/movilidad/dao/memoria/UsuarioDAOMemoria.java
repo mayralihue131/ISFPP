@@ -1,7 +1,9 @@
-package movilidad.dao;
+package movilidad.dao.memoria;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import movilidad.dao.UsuarioDAO;
 import movilidad.modelo.Usuario;
 
 public class UsuarioDAOMemoria implements UsuarioDAO {

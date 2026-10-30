@@ -11,28 +11,33 @@ import java.util.List;
 import java.util.UUID;
 
 import movilidad.dao.UsuarioDAO;
-
-import movilidad.dao.UsuarioDAOMemoria;
-
+import movilidad.dao.ViajeDAO;
+import movilidad.dao.memoria.UsuarioDAOMemoria;
+import movilidad.dao.memoria.ViajeDAOMemoria;
 import movilidad.modelo.*;
 
 public class MovilidadDigital {
 
 	private UsuarioDAO usuarioDAO;
+    private ViajeDAO viajeDAO;
 
     private List<Viaje> viajes;
 
     private List<Servicio> servicios;
 
     public MovilidadDigital() {
-
-        this(new UsuarioDAOMemoria());
+        this(new UsuarioDAOMemoria(), new ViajeDAOMemoria());
 
     }
 
     public MovilidadDigital(UsuarioDAO usuarioDAO) {
+        this(usuarioDAO, new ViajeDAOMemoria());
+    }
+
+    public MovilidadDigital(UsuarioDAO usuarioDAO, ViajeDAO viajeDAO) {
 
         this.usuarioDAO = usuarioDAO;
+        this.viajeDAO = viajeDAO;
 
         this.viajes = new ArrayList<>();
 
@@ -650,6 +655,7 @@ public class MovilidadDigital {
         viaje.solicitar(fechaHora);
 
         viajes.add(viaje);
+        viajeDAO.guardar(viaje);
 
         return viaje;
 
@@ -738,6 +744,7 @@ public class MovilidadDigital {
         viaje.aceptar(fechaHora, conductor);
 
         conductor.getConductor().setEstadoConductor(EstadoConductor.VIAJE_A_ORIGEN);
+        viajeDAO.guardar(viaje);
 
     }
 
@@ -758,6 +765,7 @@ public class MovilidadDigital {
         viaje.iniciar(fechaHora);
 
         conductor.getConductor().setEstadoConductor(EstadoConductor.VIAJE_A_DESTINO);
+        viajeDAO.guardar(viaje);
 
     }
 
@@ -778,6 +786,7 @@ public class MovilidadDigital {
         viaje.finalizar(fechaHora, viaje.getCalificacionConductor(), viaje.getCalificacionCliente());
 
         conductor.getConductor().setEstadoConductor(EstadoConductor.DISPONIBLE);
+        viajeDAO.guardar(viaje);
 
     }
 
@@ -790,6 +799,7 @@ public class MovilidadDigital {
         validarCalificacion(viaje, cliente, viaje.getCliente(), calificacion);
 
         viaje.setCalificacionConductor(calificacion);
+        viajeDAO.guardar(viaje);
 
     }
 
@@ -802,6 +812,7 @@ public class MovilidadDigital {
         validarCalificacion(viaje, conductor, viaje.getConductor(), calificacion);
 
         viaje.setCalificacionCliente(calificacion);
+        viajeDAO.guardar(viaje);
 
     }
 
@@ -862,6 +873,7 @@ public class MovilidadDigital {
             viaje.getConductor().getConductor().setEstadoConductor(EstadoConductor.DISPONIBLE);
 
         }
+        viajeDAO.guardar(viaje);
 
         return costo;
 
@@ -880,6 +892,7 @@ public class MovilidadDigital {
             viaje.getConductor().getConductor().setEstadoConductor(EstadoConductor.DISPONIBLE);
 
         }
+        viajeDAO.guardar(viaje);
 
     }
 

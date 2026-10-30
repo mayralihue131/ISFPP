@@ -134,6 +134,14 @@ public class Viaje {
         return getRegistrosViaje();
     }
 
+    public void agregarRegistroPersistido(RegistroViaje registro) {
+        if (registro == null || registro.getFechaHora() == null
+                || registro.getEstadoViaje() == null) {
+            throw new IllegalArgumentException("El registro de viaje no es válido");
+        }
+        registrosViaje.add(registro);
+    }
+
     public void solicitar(LocalDateTime fechaHora) {
         if (fechaHora == null) {
             throw new IllegalArgumentException("La fecha y la hora de la solicitud no pueden ser nulas");

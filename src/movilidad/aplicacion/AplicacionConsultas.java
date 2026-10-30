@@ -9,19 +9,20 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
 
-import movilidad.dao.CargaDatos;
-import movilidad.dao.CargaParametros;
 import movilidad.logica.MovilidadDigital;
+import movilidad.dao.UsuarioDAO;
+import movilidad.dao.bd.ServicioDAOPostgres;
+import movilidad.dao.bd.UsuarioDAOPostgres;
+import movilidad.dao.bd.ViajeDAOPostgres;
 import movilidad.modelo.*;
 
 public class AplicacionConsultas {
 
     public static void main(String[] args) {
 
-        MovilidadDigital aplicacion = new MovilidadDigital();
-
         try {
             CargaParametros.parametros();
+            MovilidadDigital aplicacion = crearAplicacion();
             cargarDatos(aplicacion);
 
             try (Scanner teclado = new Scanner(System.in)) {
@@ -54,6 +55,7 @@ public class AplicacionConsultas {
                             default:
                                 System.out.println("Opción incorrecta");
                         }
+
                     } catch (IllegalArgumentException
                             | IllegalStateException e) {
                         System.out.println("No se pudo realizar: "
@@ -70,8 +72,21 @@ public class AplicacionConsultas {
         }
     }
 
+    private static MovilidadDigital crearAplicacion() {
+        if (CargaParametros.usarBaseDatos()) {
+            UsuarioDAO usuarios = new UsuarioDAOPostgres();
+            return new MovilidadDigital(usuarios, new ViajeDAOPostgres());
+        }
+        return new MovilidadDigital();
+    }
+
     private static void cargarDatos(MovilidadDigital aplicacion)
             throws IOException {
+
+        if (CargaParametros.usarBaseDatos()) {
+            cargarDatosBase(aplicacion);
+            return;
+        }
 
         List<Vehiculo> vehiculos = new ArrayList<>();
 
@@ -173,6 +188,20 @@ public class AplicacionConsultas {
         }
 
         System.out.println("Datos cargados correctamente.");
+    }
+
+    private static void cargarDatosBase(MovilidadDigital aplicacion) {
+        UsuarioDAOPostgres usuarios = new UsuarioDAOPostgres();
+        for (Usuario usuario : usuarios.listarTodos()) {
+            if (aplicacion.buscarUsuarioPorMail(usuario.getEmail()) == null) {
+                aplicacion.agregarUsuario(usuario);
+            }
+        }
+        ServicioDAOPostgres servicios = new ServicioDAOPostgres();
+        for (Servicio servicio : servicios.listarTodos()) {
+            aplicacion.agregarServicio(servicio);
+        }
+        System.out.println("Datos de PostgreSQL cargados correctamente.");
     }
 
     private static List<Servicio> consultarServicios(
